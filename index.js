@@ -1,15 +1,21 @@
+// Install express modules needed for the app
 const express = require("express");
 const bodyParser = require("body-parser");
+// Import mongoose library to the app
 const mongoose = require("mongoose");
 
+// Initialize express instance
 const app = express();
+// Assign port number for the express app
 const port = 3000;
 
+// Add boy-parser module to the app instance
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Connect to mongodb server
 mongoose.connect(
-  `mongodb+srv://user:password@kodego.xb5nkku.mongodb.net/?retryWrites=true&w=majority`
+  "mongodb+srv://<user>:<password>@kodego.xb5nkku.mongodb.net/?retryWrites=true&w=majority"
 );
 
 const Entry = mongoose.model("Entry", {
@@ -17,43 +23,45 @@ const Entry = mongoose.model("Entry", {
   date: { type: Date, default: Date.now },
 });
 
-// Routes
-
+// Endpoint for returning all entries
 app.get("/entries", (req, res) => {
-  Entry.find({}, function (err, docs) {
+  Entry.find({}, (error, docs) => {
     res.status(200).json(docs);
   });
 });
 
+// Endpoint for returning specific entry
 app.get("/entries/:id", (req, res) => {
-  Entry.findById(req.params.id, function (err, doc) {
+  Entry.findById(req.params.id, (error, doc) => {
     res.status(200).json(doc);
   });
 });
 
+// Endpoint for creating new entries
 app.post("/entries", (req, res) => {
   const entry = new Entry({ note: req.body.note });
   entry.save().then(() => {
-    res.status(200).json({ message: "entry added successfully" });
+    res.status(200).json({ message: "Entry saved successfully" });
   });
 });
 
 app.put("/entries/:id", (req, res) => {
-  Entry.findByIdAndUpdate(
-    req.params.id,
-    { note: req.body.note },
-    function (err, doc) {
-      res.status(200).json({ message: "entry updated successfully" });
-    }
-  );
-});
-
-app.delete("/entries/:id", (req, res) => {
-  Entry.deleteOne({ _id: req.params.id }).then(() => {
-    res.status(200).json({ message: "entry deleted successfully" });
+  Entry.findByIdAndUpdate(req.params.id, { note: req.body.note }, () => {
+    res.status(200).json({ message: "Entry updated successfully" });
   });
 });
 
+app.delete("/entries/:id", (req, res) => {
+  Entry.findByIdAndDelete(req.params.id, (error) => {
+    if (error) {
+      res.status(404).json({ message: "Entry does not exists" });
+    } else {
+      res.status(200).json({ message: "Entry deleted" });
+    }
+  });
+});
+
+// Start the app
 app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
+  console.log(`App is now listening on port ${port}`);
 });
