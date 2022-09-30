@@ -1,7 +1,5 @@
-// Install express modules needed for the app
 const express = require("express");
 const bodyParser = require("body-parser");
-// Import mongoose library to the app
 const mongoose = require("mongoose");
 
 // Initialize express instance
@@ -9,7 +7,7 @@ const app = express();
 // Assign port number for the express app
 const port = 3000;
 
-// Add boy-parser module to the app instance
+// Add body-parser middleware to the app instance
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -45,12 +43,14 @@ app.post("/entries", (req, res) => {
   });
 });
 
+// Endpoint for updating an entry
 app.put("/entries/:id", (req, res) => {
   Entry.findByIdAndUpdate(req.params.id, { note: req.body.note }, () => {
     res.status(200).json({ message: "Entry updated successfully" });
   });
 });
 
+// Entry for deleting an entry
 app.delete("/entries/:id", (req, res) => {
   Entry.findByIdAndDelete(req.params.id, (error) => {
     if (error) {
