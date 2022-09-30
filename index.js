@@ -25,10 +25,32 @@ app.get("/entries", (req, res) => {
   });
 });
 
+app.get("/entries/:id", (req, res) => {
+  Entry.findById(req.params.id, function (err, doc) {
+    res.status(200).json(doc);
+  });
+});
+
 app.post("/entries", (req, res) => {
   const entry = new Entry({ note: req.body.note });
   entry.save().then(() => {
-    res.status(200).json({ message: "entry saved successfully" });
+    res.status(200).json({ message: "entry added successfully" });
+  });
+});
+
+app.put("/entries/:id", (req, res) => {
+  Entry.findByIdAndUpdate(
+    req.params.id,
+    { note: req.body.note },
+    function (err, doc) {
+      res.status(200).json({ message: "entry updated successfully" });
+    }
+  );
+});
+
+app.delete("/entries/:id", (req, res) => {
+  Entry.deleteOne({ _id: req.params.id }).then(() => {
+    res.status(200).json({ message: "entry deleted successfully" });
   });
 });
 
